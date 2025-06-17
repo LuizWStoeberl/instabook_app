@@ -16,17 +16,6 @@ export default function HomeScreen() {
                 <Text>Perfil</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => {
-                navigation.navigate('Login')
-            }}>
-                <Text>Login</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => {
-                navigation.navigate('Register')
-            }}>
-                <Text>Registro</Text>
-            </TouchableOpacity>
         </SafeAreaView>
     )
 }
