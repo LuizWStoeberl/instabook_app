@@ -2,8 +2,11 @@ import { Dimensions, FlatList, TouchableOpacity } from "react-native";
 import { SafeAreaView, StyleSheet, Text } from "react-native";
 import { View } from "react-native-web";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useNavigation } from "@react-navigation/native";
 
 export default function PostsScreencs() {
+
+    const navigation = useNavigation();
 
     const DATA = [
         {
@@ -34,7 +37,9 @@ export default function PostsScreencs() {
             <Text style={styles.title}> Novo post </Text>
 
             <View style={styles.menu}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Home')
+                }}>
                     <Text style={styles.text}> Sair </Text>
                 </TouchableOpacity>
             </View>
@@ -45,14 +50,22 @@ export default function PostsScreencs() {
                 </TouchableOpacity>
             </View>
 
-            <View>
+             <View>
+                <TouchableOpacity>
+                    <AntDesign name="upload" size={32} color="black" />
+                </TouchableOpacity>
+            </View>  
+
+            {/* <View> 
                 <FlatList
                     data={DATA}
                     renderItem={({ item }) => <Item title={item.title} />}
                     keyExtractor={item => item.id}
                     numColumns={numColumns}
                 />
-            </View>
+            </View> */}
+
+
 
         </SafeAreaView>
     )
