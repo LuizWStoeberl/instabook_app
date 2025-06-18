@@ -10,23 +10,22 @@ import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { PrimaryButton, SecondaryButton } from '../components/Buttons';
 import { EmailInput, PasswordInput } from '../components/CustomInputs';
-import { addDoc, collection } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
-export default function RegisterScreen () {
+export default function RegisterScreen() {
 
     const navigation = useNavigation();
 
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
-    const [ email, setEmail ] = useState('');
-    const [ password, setPassword ] = useState('');
-
-    const [ errorMessage, setErrorMessage ] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const register = async () => {
         if (!email || !password) {
-            setErrorMessage('Informe o e-mail e senha.');
+            setErrorMessage('Informe e-mail e senha.');
             return;
         }
 
@@ -42,68 +41,72 @@ export default function RegisterScreen () {
 
         setErrorMessage('');
 
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            console.log('Usuário: ', user);
-        })
-        .catch((error) => {
-            setErrorMessage(error.message);
-        })
 
-        await addDoc(collection(db, 'users'), {
-            email: email 
-        });
-       
-    }
+            // Salvar email no Firestore com o UID como ID do documento
+            await setDoc(doc(db, 'users', user.uid), {
+                email: user.email
+            });
+
+            console.log('Usuário registrado com sucesso:', user.email);
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Erro ao registrar usuário:', error.message);
+            setErrorMessage(error.message);
+        }
+    };
 
     useEffect(() => {
         setErrorMessage('');
-    }, [email, password])
+    }, [email, password]);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.container}>
                 <Text style={styles.title}>Registrar-se</Text>
+
                 <EmailInput value={email} setValue={setEmail} />
-                
                 <PasswordInput value={password} setValue={setPassword} />
+
                 {errorMessage &&
                     <Text style={styles.errorMessage}>{errorMessage}</Text>
                 }
-                <PrimaryButton text={"Registrar-se"} action={() => {
-                    register();
-                }} />
+
+                <PrimaryButton text={"Registrar-se"} action={register} />
 
                 <Text style={styles.text}>Já tem uma conta?</Text>
-                
-                <SecondaryButton text={'Voltar para Login'} action={() => {
-                    navigation.goBack();
-                }} />
+
+                <SecondaryButton text={'Voltar para Login'} action={() => navigation.goBack()} />
             </View>
         </SafeAreaView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
+        padding: 20,
         backgroundColor: "#bdf9ab",
+        justifyContent: "center",
     },
     title: {
         fontSize: 45,
         textAlign: 'center',
-        marginVertical: 40
+        marginBottom: 40,
+        fontWeight: 'bold'
     },
     errorMessage: {
         fontSize: 18,
         textAlign: 'center',
-        color: 'red'
+        color: 'red',
+        marginVertical: 10,
     },
     text: {
         textAlign: "center",
-        fontWeight: "semibold",
-        fontSize: 20
+        fontWeight: "600",
+        fontSize: 20,
+        marginVertical: 15,
     }
-})
+});

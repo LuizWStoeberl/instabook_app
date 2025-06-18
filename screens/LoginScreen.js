@@ -1,10 +1,17 @@
-import { TouchableOpacity } from "react-native";
-import { StyleSheet, Text, View } from "react-native";
-import { Button, SafeAreaView } from "react-native-web";
-import { EmailInput, PasswordInput } from "../components/CustomInputs";
-import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { PrimaryButton, SecondaryButton } from "../components/Buttons"
+import { useEffect, useState } from 'react';
+import {
+    SafeAreaView,
+    Text,
+    View,
+    StyleSheet,
+    TouchableOpacity
+} from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { PrimaryButton, SecondaryButton } from '../components/Buttons';
+import { EmailInput, PasswordInput } from '../components/CustomInputs';
+
 
 export default function LoginScreen() {
 
@@ -15,6 +22,7 @@ export default function LoginScreen() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    
 
     const [errorMessage, setErrorMessage] = useState('');
 

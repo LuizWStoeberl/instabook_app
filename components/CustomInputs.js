@@ -30,6 +30,20 @@ export function PasswordInput ({ placeholder = "Senha", value, setValue }) {
     )
 }
 
+export function NameInput({ placeholder = "Nome", value, setValue}) {
+    return(
+        <TextInput
+            placeholder={placeholder}
+            placeholderTextColor="black"
+            style={styles.input}
+            inputMode="text"
+            autoCapitalize="words"
+            onChangeText={setValue}
+            value={value}
+        />
+    )
+}
+
 export function CustomTextInput ({ placeholder, value, setValue }) {
     return (
         <TextInput

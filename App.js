@@ -6,6 +6,7 @@ import AuthNavigator from './navigation/AuthNavigator';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { View, ActivityIndicator } from 'react-native';
+import { AuthProvider } from './context/AuthContext';
 
 export default function App() {
 
@@ -32,8 +33,10 @@ export default function App() {
     }
 
     return (
+        <AuthProvider>
         <NavigationContainer>
             {user ? <AppNavigator /> : <AuthNavigator />}
         </NavigationContainer>
+        </AuthProvider>
     );
 }
