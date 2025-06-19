@@ -3,9 +3,10 @@ import { SafeAreaView, StyleSheet, Text, TouchableOpacity, Image, View, TextInpu
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
-import { db, auth, storage } from '../firebase.js';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, auth } from '../firebase.js';
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import * as FileSystem from 'expo-file-system';
+
 
 export default function PostsScreencs() {
   const navigation = useNavigation();
@@ -31,45 +32,56 @@ export default function PostsScreencs() {
       Alert.alert("Erro", "Você precisa estar logado.");
       return;
     }
-
+  
     try {
-      let imageUrl = "";
+      let imagePaths = [];
+  
       if (imagem) {
-        const imgName = `${user.uid}_${Date.now()}`;
-        const imgRef = ref(storage, `posts/${imgName}`);
-        const response = await fetch(imagem);
-        const blob = await response.blob();
-        await uploadBytes(imgRef, blob);
-        imageUrl = await getDownloadURL(imgRef);
+        const nomeArquivo = `${user.uid}_${Date.now()}.jpg`;
+  
+        // Caminhos locais
+        const caminhoGeral = `${FileSystem.documentDirectory}geral/${nomeArquivo}`;
+        const caminhoUsuario = `${FileSystem.documentDirectory}usuarios/${user.uid}/${nomeArquivo}`;
+  
+        // Criação das pastas se não existirem
+        await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}geral/`, { intermediates: true });
+        await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}usuarios/${user.uid}/`, { intermediates: true });
+  
+        // Copiando a imagem para os dois destinos
+        await FileSystem.copyAsync({ from: imagem, to: caminhoGeral });
+        await FileSystem.copyAsync({ from: imagem, to: caminhoUsuario });
+  
+        imagePaths = [caminhoGeral, caminhoUsuario];
       }
-
+  
       const postData = {
         descricao,
         localizacao,
-        imagens: imageUrl ? [imageUrl] : [],
+        imagens: imagePaths,
         criadoEm: Timestamp.now(),
         userId: user.uid,
       };
-
-      // Cria o post na subcoleção do usuário e captura a referência do documento criado
+  
+      // Cria o post na subcoleção do usuário
       const userPostRef = collection(db, "users", user.uid, "posts");
       const postDoc = await addDoc(userPostRef, postData);
-
-      // Cria um post geral referenciando o post do usuário
+  
+      // Cria post geral com referência
       await addDoc(collection(db, "posts"), {
         ...postData,
         refUserPost: `users/${user.uid}/posts/${postDoc.id}`,
       });
-
-      Alert.alert("Sucesso", "Post enviado com sucesso!");
+  
+      Alert.alert("Sucesso", "Post salvo localmente!");
       setImagem(null);
       setDescricao("");
       setLocalizacao("");
     } catch (error) {
       console.error(error);
-      Alert.alert("Erro", "Falha ao enviar post.");
+      Alert.alert("Erro", "Falha ao salvar post.");
     }
   }
+  
 
 
   return (
