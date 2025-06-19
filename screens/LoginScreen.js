@@ -60,6 +60,7 @@ export default function LoginScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.containerFilho}>
             <View >
                 <Text style={styles.title}>Faça seu Login</Text>
             </View>
@@ -96,6 +97,7 @@ export default function LoginScreen() {
                 <Text style={styles.buttonText}>Registre-se</Text>
             </TouchableOpacity>
         </SafeAreaView>
+        </SafeAreaView>
     )
 }
 
@@ -104,6 +106,15 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         backgroundColor: "#bdf9ab",
+    },
+    containerFilho: {
+         flex: 1,
+        padding: 10,
+        backgroundColor: "#bdf9ab",
+        width: 500,
+        height: 600,
+        alignItems: "center",
+        alignSelf: "center"
     },
     title: {
         textAlign: "center",

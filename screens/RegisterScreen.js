@@ -47,7 +47,8 @@ export default function RegisterScreen() {
 
             // Salvar email no Firestore com o UID como ID do documento
             await setDoc(doc(db, 'users', user.uid), {
-                email: user.email
+                email: user.email,
+                name: nome
             });
 
             console.log('Usuário registrado com sucesso:', user.email);
@@ -63,8 +64,9 @@ export default function RegisterScreen() {
     }, [email, password]);
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.containerFilho}>
+            <View >
                 <Text style={styles.title}>Registrar-se</Text>
 
                 <EmailInput value={email} setValue={setEmail} />
@@ -81,15 +83,24 @@ export default function RegisterScreen() {
                 <SecondaryButton text={'Voltar para Login'} action={() => navigation.goBack()} />
             </View>
         </SafeAreaView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: 10,
         backgroundColor: "#bdf9ab",
-        justifyContent: "center",
+    },
+    containerFilho: {
+         flex: 1,
+        padding: 10,
+        backgroundColor: "#bdf9ab",
+        width: 500,
+        height: 600,
+        alignItems: "center",
+        alignSelf: "center"
     },
     title: {
         fontSize: 45,
