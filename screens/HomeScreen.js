@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity } from 
 import { SafeAreaView, View } from "react-native"
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { Image } from "react-native";
 
@@ -20,36 +20,38 @@ export default function HomeScreen() {
     if (!user) return <Text>Faça login</Text>;
 
     useEffect(() => {
-        const postsCollection = collection(db, "posts");
+        async function carregarPosts() {
+            try {
+                const postsRef = collection(db, 'posts');
+                const snapshot = await getDocs(postsRef);
 
-        const unsubscribe = onSnapshot(postsCollection, (snapshot) => {
-            const data = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+                const lista = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
 
-            // Ordena pelo mais recente
-            data.sort((a, b) => b.criadoEm?.seconds - a.criadoEm?.seconds);
+                setPosts(lista);
+            } catch (error) {
+                console.error("Erro ao carregar posts:", error);
+            }
+        }
 
-            setPosts(data);
-        });
-
-        return () => unsubscribe(); // Limpa o listener quando sair da tela
+        carregarPosts();
     }, []);
 
     const renderItem = ({ item }) => (
-        <View style={styles.card}>
-            {item.imagens?.length > 0 && (
-                <Image
-                    source={{ uri: item.imagens[0] }}
-                    style={styles.image}
-                    resizeMode="cover"
-                />
+        <View style={styles.postContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: item.userId, userEmail: item.userEmail })}>
+                <Text style={[styles.postText]}>
+                    <Text style={styles.label}>Usuário:</Text> {item.userEmail || 'Desconhecido'}
+                </Text>
+            </TouchableOpacity>
+            <Text style={styles.postText}><Text style={styles.label}>Descrição:</Text> {item.descricao}</Text>
+            <Text style={styles.postText}><Text style={styles.label}>Localização:</Text> {item.localizacao}</Text>
+
+            {item.imagens?.[0] && (
+                <Image source={{ uri: item.imagens[0] }} style={styles.postImage} />
             )}
-            <View style={styles.cardContent}>
-                <Text style={styles.description}>{item.descricao}</Text>
-                <Text style={styles.location}>📍 {item.localizacao}</Text>
-            </View>
         </View>
     );
 
@@ -63,7 +65,7 @@ export default function HomeScreen() {
             </View>
 
             <TouchableOpacity onPress={() => {
-                navigation.navigate('Profile')
+                navigation.navigate('myprofile')
             }}>
                 <Text>Perfil</Text>
             </TouchableOpacity>
@@ -126,4 +128,23 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#666",
     },
+    postContainer: {
+        marginBottom: 20,
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        elevation: 2,
+    },
+    postImage: {
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+    },
+    postText: {
+        marginTop: 10,
+        fontSize: 16,
+    },
+    label: {
+        fontWeight: 'bold',
+    }
 })
