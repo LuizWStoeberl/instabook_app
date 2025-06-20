@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, Image, View, TextInput, Alert } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -9,12 +9,21 @@ import * as Location from 'expo-location';
 import { useNavigation } from "@react-navigation/native";
 import { db, auth } from '../firebase.js';
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-export default function PostsScreencs() {
+export default function PostsScreencs({ route }) {
     const navigation = useNavigation();
     const [imagem, setImagem] = useState(null);
     const [descricao, setDescricao] = useState("");
     const [localizacao, setLocalizacao] = useState("");
+
+    useEffect(() => {
+        if (route?.params?.localizacaoEscolhida) {
+            setLocalizacao(route.params.localizacaoEscolhida);
+        }
+    }, [route?.params?.localizacaoEscolhida]);
+
 
     async function pickImage() {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -45,6 +54,24 @@ export default function PostsScreencs() {
             setLocalizacao(textoLocal);
         } else {
             setLocalizacao(`Lat: ${local.coords.latitude}, Lon: ${local.coords.longitude}`);
+        }
+    }
+
+    async function tirarFoto() {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+        if (permission.status !== 'granted') {
+            Alert.alert('Permissão negada', 'Permita o acesso à câmera nas configurações.');
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImagem(result.assets[0].uri);
         }
     }
 
@@ -115,6 +142,11 @@ export default function PostsScreencs() {
                 <Entypo name="location-pin" size={24} color="white" />
             </TouchableOpacity>
 
+            <TouchableOpacity onPress={() => navigation.navigate("SelecionarLocal")} style={styles.localizacaoBtn}>
+                <Text style={styles.localizacaoText}>Selecionar no Mapa</Text>
+                <Entypo name="map" size={24} color="white" />
+            </TouchableOpacity>
+
             {localizacao !== "" && (
                 <Text style={{ marginTop: 10, fontStyle: 'italic' }}>
                     Local detectado: {localizacao}
@@ -122,8 +154,12 @@ export default function PostsScreencs() {
             )}
 
             <View style={styles.icones}>
-                <TouchableOpacity onPress={pickImage}>
+                <TouchableOpacity onPress={pickImage} style={{ marginHorizontal: 10 }}>
                     <AntDesign name="picture" size={50} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={tirarFoto} style={{ marginHorizontal: 10 }}>
+                    <Entypo name="camera" size={50} color="black" />
                 </TouchableOpacity>
             </View>
 
@@ -139,6 +175,28 @@ export default function PostsScreencs() {
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.buttonRegister}>
                 <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
+
+
+            <View style={styles.rodape}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Home')
+                }}>
+                    <FontAwesome6 name="house" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('myprofile')
+                }}>
+                    <Ionicons name="person" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Posts')
+                }}>
+                    <FontAwesome6 name="circle-plus" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
+
         </SafeAreaView>
     );
 }
@@ -203,4 +261,17 @@ const styles = StyleSheet.create({
         padding: 10,
         justifyContent: "center",
     },
+     rodape: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 70,
+        backgroundColor: '#e0e0e0',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderColor: '#ccc'
+    }
 });

@@ -6,6 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from 'expo-file-system';
 import { deleteDoc, doc } from "firebase/firestore";
 import { Alert } from "react-native";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function MyProfileScreen() {
   const [posts, setPosts] = useState([]);
@@ -73,7 +75,7 @@ const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Meu Perfil</Text>
+      <Text style={styles.header}>{user?.email}</Text>
       <Text style={styles.subHeader}>{user?.email}</Text>
 
       <FlatList
@@ -94,11 +96,25 @@ const navigation = useNavigation();
 
     
 
-      <TouchableOpacity onPress={() => {
-        navigation.navigate('Home')
-      }}>
-        <Text >Voltar </Text>
-      </TouchableOpacity>
+      <View style={styles.rodape}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Home')
+                }}>
+                    <FontAwesome6 name="house" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('myprofile')
+                }}>
+                    <Ionicons name="person" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Posts')
+                }}>
+                    <FontAwesome6 name="circle-plus" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
     </View>
   );
 }
@@ -107,7 +123,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f0fff0',
+    backgroundColor: '#dfffdc',
+    paddingBottom: 80,
+    paddingTop: 80
   },
   header: {
     fontSize: 24,
@@ -144,4 +162,17 @@ const styles = StyleSheet.create({
     color: "#aa0000",
     fontWeight: "bold",
   },
+  rodape: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 70,
+        backgroundColor: '#e0e0e0',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderColor: '#ccc'
+    }
 });

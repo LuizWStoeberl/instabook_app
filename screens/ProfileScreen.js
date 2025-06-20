@@ -3,6 +3,8 @@ import { View, Text, FlatList, Image, StyleSheet, Dimensions, SafeAreaView, Touc
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function UserProfile({ route }) {
     const { userId, userEmail } = route.params;
@@ -59,6 +61,26 @@ export default function UserProfile({ route }) {
             }}>
                 <Text >Voltar </Text>
             </TouchableOpacity>
+
+            <View style={styles.rodape}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Home')
+                }}>
+                    <FontAwesome6 name="house" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('myprofile')
+                }}>
+                    <Ionicons name="person" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Posts')
+                }}>
+                    <FontAwesome6 name="circle-plus" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 }
@@ -68,6 +90,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         backgroundColor: '#dfffdc',
+        paddingBottom: 80,
+        paddingTop: 80
     },
     header: {
         marginTop: 50,
@@ -84,4 +108,17 @@ const styles = StyleSheet.create({
     row: {
         justifyContent: 'space-between',
     },
+    rodape: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 70,
+        backgroundColor: '#e0e0e0',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderColor: '#ccc'
+    }
 });

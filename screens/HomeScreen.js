@@ -4,12 +4,14 @@ import { SafeAreaView, View } from "react-native"
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import { Image } from "react-native";
 import { deleteDoc, doc } from "firebase/firestore";
 import * as FileSystem from 'expo-file-system';
 import { Alert } from "react-native";
-
+import { signOut } from "firebase/auth";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function HomeScreen() {
 
@@ -57,58 +59,45 @@ export default function HomeScreen() {
                 <Image source={{ uri: item.imagens[0] }} style={styles.postImage} />
             )}
 
-            <TouchableOpacity onPress={() => excluirPost(item)}>
-                <Text>Deletar Post</Text>
-            </TouchableOpacity>
         </View>
     );
-    const excluirPost = async (post) => {
-        try {
-          if (post.imagens && post.imagens.length > 0) {
-            for (const path of post.imagens) {
-              try {
-                await FileSystem.deleteAsync(path, { idempotent: true });
-              } catch (e) {
-                console.warn("Erro ao deletar imagem local:", e);
-              }
-            }
-          }
-      
-          await deleteDoc(doc(db, "posts", post.id));
 
-          if (post.refUserPost) {
-            const caminho = post.refUserPost.split("/");
-            await deleteDoc(doc(db, caminho[0], caminho[1], caminho[2], caminho[3]));
-          }
-      
-          Alert.alert("Sucesso", "Post excluído com sucesso!");
-        } catch (error) {
-          console.error("Erro ao excluir:", error);
-          Alert.alert("Erro", "Não foi possível excluir o post.");
-        }
-      };
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text>Tela Inicial</Text>
 
-            <View>
-                <Text>Email do usuario: {user?.email}</Text>
+            <View style={styles.rodape}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Home')
+                }}>
+                    <FontAwesome6 name="house" size={24} color="black" />
+                </TouchableOpacity>
 
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('myprofile')
+                }}>
+                    <Ionicons name="person" size={24} color="black" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Posts')
+                }}>
+                    <FontAwesome6 name="circle-plus" size={24} color="black" />
+                </TouchableOpacity>
             </View>
 
             <TouchableOpacity onPress={() => {
                 navigation.navigate('myprofile')
             }}>
-                <Text>Perfil</Text>
+                <Text>{user?.email}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => {
-                navigation.navigate('Posts')
-            }}>
-                <Text>Criar Posts</Text>
+                signOut(auth)
+                
+            }} style = { styles.buttonRegister }>
+                <Text style={styles.buttonText}>Sair</Text>
             </TouchableOpacity>
-
 
             <FlatList
                 data={posts}
@@ -124,6 +113,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         backgroundColor: "#bdf9ab",
+        paddingBottom: 80,
+        paddingTop: 200
     },
     center: {
         flex: 1,
@@ -186,9 +177,37 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 6,
         alignItems: "center",
-      },
-      deleteText: {
+    },
+    deleteText: {
         color: "#aa0000",
         fontWeight: "bold",
-      }      
+    },
+    rodape: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 70,
+        backgroundColor: '#e0e0e0',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderColor: '#ccc'
+    },
+    buttonRegister: {
+        padding: 15,
+        borderRadius: 15,
+        marginVertical: 15,
+        backgroundColor: '#437a36',
+        borderWidth: 2,
+        width: 100,
+        height: 50
+    },
+    buttonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 15,
+        fontWeight: 'bold'
+    }
 })
