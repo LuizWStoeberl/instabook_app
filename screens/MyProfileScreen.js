@@ -3,6 +3,9 @@ import { View, Text, FlatList, Image, StyleSheet, Dimensions, TouchableOpacity }
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
+import * as FileSystem from 'expo-file-system';
+import { deleteDoc, doc } from "firebase/firestore";
+import { Alert } from "react-native";
 
 export default function MyProfileScreen() {
   const [posts, setPosts] = useState([]);
@@ -42,6 +45,32 @@ const navigation = useNavigation();
     )
   );
 
+  const excluirPost = async (post) => {
+    try {
+      if (post.imagens && post.imagens.length > 0) {
+        for (const path of post.imagens) {
+          try {
+            await FileSystem.deleteAsync(path, { idempotent: true });
+          } catch (e) {
+            console.warn("Erro ao deletar imagem local:", e);
+          }
+        }
+      }
+  
+      await deleteDoc(doc(db, "posts", post.id));
+  
+      if (post.refUserPost) {
+        const caminho = post.refUserPost.split("/");
+        await deleteDoc(doc(db, caminho[0], caminho[1], caminho[2], caminho[3]));
+      }
+  
+      Alert.alert("Sucesso", "Post excluído com sucesso!");
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      Alert.alert("Erro", "Não foi possível excluir o post.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Meu Perfil</Text>
@@ -50,7 +79,14 @@ const navigation = useNavigation();
       <FlatList
         data={posts}
         keyExtractor={item => item.id}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <View style={styles.gridItem}>
+            {renderItem({ item })}
+            <TouchableOpacity onPress={() => excluirPost(item)} style={styles.deleteButton}>
+              <Text style={styles.deleteText}>Excluir</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         numColumns={3}
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -91,5 +127,21 @@ const styles = StyleSheet.create({
   },
   row: {
     justifyContent: 'space-between',
+  },
+  gridItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 5,
+  },
+  deleteButton: {
+    marginTop: 10,
+    backgroundColor: "#ffdddd",
+    padding: 8,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  deleteText: {
+    color: "#aa0000",
+    fontWeight: "bold",
   },
 });

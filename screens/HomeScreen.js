@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { Image } from "react-native";
+import { deleteDoc, doc } from "firebase/firestore";
+import * as FileSystem from 'expo-file-system';
+import { Alert } from "react-native";
+
 
 export default function HomeScreen() {
 
@@ -52,8 +56,37 @@ export default function HomeScreen() {
             {item.imagens?.[0] && (
                 <Image source={{ uri: item.imagens[0] }} style={styles.postImage} />
             )}
+
+            <TouchableOpacity onPress={() => excluirPost(item)}>
+                <Text>Deletar Post</Text>
+            </TouchableOpacity>
         </View>
     );
+    const excluirPost = async (post) => {
+        try {
+          if (post.imagens && post.imagens.length > 0) {
+            for (const path of post.imagens) {
+              try {
+                await FileSystem.deleteAsync(path, { idempotent: true });
+              } catch (e) {
+                console.warn("Erro ao deletar imagem local:", e);
+              }
+            }
+          }
+      
+          await deleteDoc(doc(db, "posts", post.id));
+
+          if (post.refUserPost) {
+            const caminho = post.refUserPost.split("/");
+            await deleteDoc(doc(db, caminho[0], caminho[1], caminho[2], caminho[3]));
+          }
+      
+          Alert.alert("Sucesso", "Post excluído com sucesso!");
+        } catch (error) {
+          console.error("Erro ao excluir:", error);
+          Alert.alert("Erro", "Não foi possível excluir o post.");
+        }
+      };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -146,5 +179,16 @@ const styles = StyleSheet.create({
     },
     label: {
         fontWeight: 'bold',
-    }
+    },
+    deleteButton: {
+        marginTop: 10,
+        backgroundColor: "#ffdddd",
+        padding: 8,
+        borderRadius: 6,
+        alignItems: "center",
+      },
+      deleteText: {
+        color: "#aa0000",
+        fontWeight: "bold",
+      }      
 })
