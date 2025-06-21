@@ -75,8 +75,8 @@ const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{user?.email}</Text>
-      <Text style={styles.subHeader}>{user?.email}</Text>
+      <Text style={styles.header}>{auth.currentUser?.displayName}</Text>
+      <Text style={styles.subHeader}>{auth.currentUser?.displayName}</Text>
 
       <FlatList
         data={posts}

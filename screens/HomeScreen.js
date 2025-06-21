@@ -49,7 +49,7 @@ export default function HomeScreen() {
         <View style={styles.postContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: item.userId, userEmail: item.userEmail })}>
                 <Text style={[styles.postText]}>
-                    <Text style={styles.label}>Usuário:</Text> {item.userEmail || 'Desconhecido'}
+                    <Text style={styles.label}>Usuário:</Text> {item.userDisplayName || 'Desconhecido'}
                 </Text>
             </TouchableOpacity>
             <Text style={styles.postText}><Text style={styles.label}>Descrição:</Text> {item.descricao}</Text>
@@ -89,7 +89,7 @@ export default function HomeScreen() {
             <TouchableOpacity onPress={() => {
                 navigation.navigate('myprofile')
             }}>
-                <Text>{user?.email}</Text>
+                <Text>{auth.currentUser?.displayName}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => {

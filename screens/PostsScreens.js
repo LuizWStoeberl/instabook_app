@@ -106,6 +106,7 @@ export default function PostsScreencs({ route }) {
                 criadoEm: Timestamp.now(),
                 userId: user.uid,
                 userEmail: user.email,
+                userDisplayName: user.displayName
             };
 
             const userPostRef = collection(db, "users", user.uid, "posts");

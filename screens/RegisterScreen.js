@@ -7,9 +7,9 @@ import {
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { PrimaryButton, SecondaryButton } from '../components/Buttons';
-import { EmailInput, PasswordInput } from '../components/CustomInputs';
+import { EmailInput, NameInput, PasswordInput } from '../components/CustomInputs';
 import { doc, setDoc } from 'firebase/firestore';
 
 export default function RegisterScreen() {
@@ -22,6 +22,7 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [name, setName] = useState('');
 
     const register = async () => {
         if (!email || !password) {
@@ -45,14 +46,18 @@ export default function RegisterScreen() {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            await updateProfile(user, {
+                displayName: name
+            });
+
             // Salvar email no Firestore com o UID como ID do documento
             await setDoc(doc(db, 'users', user.uid), {
                 email: user.email,
-                name: nome
+                name: name
             });
 
             console.log('Usuário registrado com sucesso:', user.email);
-            navigation.navigate('Login');
+            navigation.navigate('Home');
         } catch (error) {
             console.error('Erro ao registrar usuário:', error.message);
             setErrorMessage(error.message);
@@ -71,6 +76,7 @@ export default function RegisterScreen() {
 
                 <EmailInput value={email} setValue={setEmail} />
                 <PasswordInput value={password} setValue={setPassword} />
+                <NameInput value={name} setValue={setName} />
 
                 {errorMessage &&
                     <Text style={styles.errorMessage}>{errorMessage}</Text>
@@ -92,6 +98,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         backgroundColor: "#bdf9ab",
+        paddingTop: 80
     },
     containerFilho: {
          flex: 1,

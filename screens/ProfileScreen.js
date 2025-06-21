@@ -5,10 +5,12 @@ import { db } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { doc, getDoc } from "firebase/firestore";
 
 export default function UserProfile({ route }) {
     const { userId, userEmail } = route.params;
     const [posts, setPosts] = useState([]);
+    const [userName, setUserName] = useState('');
 
     const navigation = useNavigation();
 
@@ -25,6 +27,16 @@ export default function UserProfile({ route }) {
                 }));
 
                 setPosts(lista);
+
+                const userDoc = await getDoc(doc(db, "users", userId));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setUserName(userData.name);
+                } else {
+                    setUserName('');
+                }
+
+
             } catch (error) {
                 console.error("Erro ao carregar posts do usuário:", error);
             }
@@ -45,7 +57,7 @@ export default function UserProfile({ route }) {
     return (
         <SafeAreaView style={styles.container}>
 
-            <Text style={styles.header}>Perfil de {userEmail}</Text>
+            <Text style={styles.header}>Perfil de {userName}</Text>
 
             <FlatList
                 data={posts}
@@ -56,11 +68,7 @@ export default function UserProfile({ route }) {
                 contentContainerStyle={{ paddingBottom: 20 }}
             />
 
-            <TouchableOpacity onPress={() => {
-                navigation.navigate('Home')
-            }}>
-                <Text >Voltar </Text>
-            </TouchableOpacity>
+            
 
             <View style={styles.rodape}>
                 <TouchableOpacity onPress={() => {
