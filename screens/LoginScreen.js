@@ -70,14 +70,6 @@ export default function LoginScreen() {
 
                 <PasswordInput value={password} setValue={setPassword}></PasswordInput>
 
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.push('ForgotPassword');
-                    }}
-                >
-                    <Text>Esqueci a senha</Text>
-                </TouchableOpacity>
-
                 {errorMessage &&
                     <Text style={styles.errorMessage}>{errorMessage}</Text>
                 }

@@ -129,75 +129,79 @@ export default function PostsScreencs({ route }) {
 
     return (
         <SafeAreaView style={styles.coontainer}>
-            <Text style={styles.title}>Novo post</Text>
+            <SafeAreaView style={styles.containerFilho}>
+                <Text style={styles.title}>Novo post</Text>
 
-            <TextInput
-                placeholder="Descrição"
-                value={descricao}
-                onChangeText={setDescricao}
-                style={styles.inputDescription}
-            />
+                <View style={styles.localButtons}>
+                    <TouchableOpacity onPress={pegarLocalizacaoAtual} style={styles.localizacaoBtn}>
+                        <Text style={styles.localizacaoText}>Usar Localização Atual</Text>
+                        <Entypo name="location-pin" size={24} color="white" />
+                    </TouchableOpacity>
 
-            <TouchableOpacity onPress={pegarLocalizacaoAtual} style={styles.localizacaoBtn}>
-                <Text style={styles.localizacaoText}>Usar Localização Atual</Text>
-                <Entypo name="location-pin" size={24} color="white" />
-            </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("SelecionarLocal")} style={styles.localizacaoBtn}>
+                        <Text style={styles.localizacaoText}>Selecionar no Mapa</Text>
+                        <Entypo name="map" size={24} color="white" />
+                    </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate("SelecionarLocal")} style={styles.localizacaoBtn}>
-                <Text style={styles.localizacaoText}>Selecionar no Mapa</Text>
-                <Entypo name="map" size={24} color="white" />
-            </TouchableOpacity>
+                </View>
 
-            {localizacao !== "" && (
-                <Text style={{ marginTop: 10, fontStyle: 'italic' }}>
-                    Local detectado: {localizacao}
-                </Text>
-            )}
+                {localizacao !== "" && (
+                    <Text style={{ marginTop: 10, fontStyle: 'italic' }}>
+                        Local detectado: {localizacao}
+                    </Text>
+                )}
 
-            <View style={styles.icones}>
-                <TouchableOpacity onPress={pickImage} style={{ marginHorizontal: 10 }}>
-                    <AntDesign name="picture" size={50} color="black" />
+                <View style={styles.icones}>
+                    <TouchableOpacity onPress={pickImage} style={{ marginHorizontal: 10 }}>
+                        <AntDesign name="picture" size={50} color="black" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={tirarFoto} style={{ marginHorizontal: 10 }}>
+                        <Entypo name="camera" size={50} color="black" />
+                    </TouchableOpacity>
+                </View>
+
+                
+
+                <TextInput
+                    placeholder="Diga algo..."
+                    value={descricao}
+                    onChangeText={setDescricao}
+                    style={styles.inputDescription}
+                />
+
+                {imagem && <Image style={styles.image} source={{ uri: imagem }} />}
+
+
+                <TouchableOpacity onPress={async () => {
+                    await uploadPost();
+                    navigation.navigate('Home');
+                }} style={styles.buttonRegister}>
+                    <Text style={styles.buttonText}>Postar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={tirarFoto} style={{ marginHorizontal: 10 }}>
-                    <Entypo name="camera" size={50} color="black" />
-                </TouchableOpacity>
-            </View>
 
-            {imagem && <Image style={styles.image} source={{ uri: imagem }} />}
+                <View style={styles.rodape}>
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate('Home')
+                    }}>
+                        <FontAwesome6 name="house" size={24} color="black" />
+                    </TouchableOpacity>
 
-            <TouchableOpacity onPress={async () => {
-                await uploadPost();
-                navigation.navigate('Home');
-            }} style={styles.buttonRegister}>
-                <Text style={styles.buttonText}>Postar</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate('myprofile')
+                    }}>
+                        <Ionicons name="person" size={24} color="black" />
+                    </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.buttonRegister}>
-                <Text style={styles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate('Posts')
+                    }}>
+                        <FontAwesome6 name="circle-plus" size={24} color="black" />
+                    </TouchableOpacity>
+                </View>
 
-
-            <View style={styles.rodape}>
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate('Home')
-                }}>
-                    <FontAwesome6 name="house" size={24} color="black" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate('myprofile')
-                }}>
-                    <Ionicons name="person" size={24} color="black" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate('Posts')
-                }}>
-                    <FontAwesome6 name="circle-plus" size={24} color="black" />
-                </TouchableOpacity>
-            </View>
-
+            </SafeAreaView>
         </SafeAreaView>
     );
 }
@@ -205,8 +209,17 @@ export default function PostsScreencs({ route }) {
 const styles = StyleSheet.create({
     coontainer: {
         flex: 1,
+        backgroundColor: "#bdf9ab",
+    },
+    containerFilho: {
+        flex: 1,
         padding: 20,
         backgroundColor: "#bdf9ab",
+        marginTop: 100,
+    },
+    localButtons: {
+        flexDirection: "row",
+        alignItems: 'center',
     },
     title: {
         fontSize: 45,
@@ -223,7 +236,7 @@ const styles = StyleSheet.create({
     },
     localizacaoBtn: {
         backgroundColor: '#437a36',
-        padding: 12,
+        padding: 10,
         borderRadius: 10,
         marginTop: 10,
         flexDirection: 'row',
@@ -262,7 +275,7 @@ const styles = StyleSheet.create({
         padding: 10,
         justifyContent: "center",
     },
-     rodape: {
+    rodape: {
         position: 'absolute',
         bottom: 0,
         left: 0,

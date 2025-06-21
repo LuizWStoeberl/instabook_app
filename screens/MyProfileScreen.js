@@ -8,12 +8,13 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { Alert } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 export default function MyProfileScreen() {
   const [posts, setPosts] = useState([]);
   const user = auth.currentUser;
 
-const navigation = useNavigation();
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (!user) return;
@@ -58,14 +59,14 @@ const navigation = useNavigation();
           }
         }
       }
-  
+
       await deleteDoc(doc(db, "posts", post.id));
-  
+
       if (post.refUserPost) {
         const caminho = post.refUserPost.split("/");
         await deleteDoc(doc(db, caminho[0], caminho[1], caminho[2], caminho[3]));
       }
-  
+
       Alert.alert("Sucesso", "Post excluído com sucesso!");
     } catch (error) {
       console.error("Erro ao excluir:", error);
@@ -75,8 +76,6 @@ const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{auth.currentUser?.displayName}</Text>
-      <Text style={styles.subHeader}>{auth.currentUser?.displayName}</Text>
 
       <FlatList
         data={posts}
@@ -85,36 +84,37 @@ const navigation = useNavigation();
           <View style={styles.gridItem}>
             {renderItem({ item })}
             <TouchableOpacity onPress={() => excluirPost(item)} style={styles.deleteButton}>
-              <Text style={styles.deleteText}>Excluir</Text>
+              <EvilIcons name="trash" size={24} color="black" />
             </TouchableOpacity>
           </View>
         )}
         numColumns={3}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        ListHeaderComponent={<View style={styles.cabeca}><Text style={styles.header}>{auth.currentUser?.displayName}</Text></View>}
+        ListFooterComponent={<View style={{ height: 90 }} />} // para não esconder atrás do rodapé
       />
 
-    
+
 
       <View style={styles.rodape}>
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate('Home')
-                }}>
-                    <FontAwesome6 name="house" size={24} color="black" />
-                </TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+          navigation.navigate('Home')
+        }}>
+          <FontAwesome6 name="house" size={24} color="black" />
+        </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate('myprofile')
-                }}>
-                    <Ionicons name="person" size={24} color="black" />
-                </TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+          navigation.navigate('myprofile')
+        }}>
+          <Ionicons name="person" size={24} color="black" />
+        </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => {
-                    navigation.navigate('Posts')
-                }}>
-                    <FontAwesome6 name="circle-plus" size={24} color="black" />
-                </TouchableOpacity>
-            </View>
+        <TouchableOpacity onPress={() => {
+          navigation.navigate('Posts')
+        }}>
+          <FontAwesome6 name="circle-plus" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -122,10 +122,8 @@ const navigation = useNavigation();
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
     backgroundColor: '#dfffdc',
-    paddingBottom: 80,
-    paddingTop: 80
+    marginTop: 50
   },
   header: {
     fontSize: 24,
@@ -138,8 +136,8 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   gridImage: {
-    width: Dimensions.get('window').width / 3 - 12,
-    height: Dimensions.get('window').width / 3 - 12,
+    width: 115,
+    height: 115,
     margin: 5,
     borderRadius: 10,
   },
@@ -150,29 +148,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     margin: 5,
+    position: 'relative'
   },
   deleteButton: {
-    marginTop: 10,
+    position: 'absolute',
+    top: 10,
+    right: 10,
     backgroundColor: "#ffdddd",
-    padding: 8,
-    borderRadius: 6,
-    alignItems: "center",
+    borderRadius: 15,
   },
   deleteText: {
-    color: "#aa0000",
-    fontWeight: "bold",
+    alignSelf: 'center'
   },
   rodape: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 70,
-        backgroundColor: '#e0e0e0',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderColor: '#ccc'
-    }
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: '#e0e0e0',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderColor: '#ccc'
+  },
+  cabeca: {
+    height: 70,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: '#dfffdc', // opcional
+    marginBottom: 10
+  }
+
 });

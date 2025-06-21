@@ -48,12 +48,12 @@ export default function HomeScreen() {
     const renderItem = ({ item }) => (
         <View style={styles.postContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: item.userId, userEmail: item.userEmail })}>
-                <Text style={[styles.postText]}>
-                    <Text style={styles.label}>Usuário:</Text> {item.userDisplayName || 'Desconhecido'}
+                <Text style={[styles.postName]}>
+                    <Text ></Text> {item.userDisplayName || 'Desconhecido'}
                 </Text>
             </TouchableOpacity>
-            <Text style={styles.postText}><Text style={styles.label}>Descrição:</Text> {item.descricao}</Text>
-            <Text style={styles.postText}><Text style={styles.label}>Localização:</Text> {item.localizacao}</Text>
+            <Text style={styles.postText}><Text ></Text> {item.descricao}</Text>
+            <Text style={styles.postLocal}><Text ></Text> {item.localizacao}</Text>
 
             {item.imagens?.[0] && (
                 <Image source={{ uri: item.imagens[0] }} style={styles.postImage} />
@@ -86,18 +86,20 @@ export default function HomeScreen() {
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity onPress={() => {
-                navigation.navigate('myprofile')
-            }}>
-                <Text>{auth.currentUser?.displayName}</Text>
-            </TouchableOpacity>
+            <View style={styles.cabeca}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('myprofile')
+                }}>
+                    <Text style={styles.nomeText}>{auth.currentUser?.displayName}</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => {
-                signOut(auth)
-                
-            }} style = { styles.buttonRegister }>
-                <Text style={styles.buttonText}>Sair</Text>
-            </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    signOut(auth)
+
+                }} style={styles.buttonLogout}>
+                    <Text style={styles.buttonText}>Sair</Text>
+                </TouchableOpacity>
+            </View>
 
             <FlatList
                 data={posts}
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: "#bdf9ab",
         paddingBottom: 80,
-        paddingTop: 200
+        paddingTop: 150
     },
     center: {
         flex: 1,
@@ -168,8 +170,14 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 16,
     },
-    label: {
-        fontWeight: 'bold',
+    postLocal: {
+        marginTop: 10,
+        fontSize: 12
+    },
+    postName: {
+        marginTop: 10,
+        fontSize: 20,
+        fontWeight: 'bold'
     },
     deleteButton: {
         marginTop: 10,
@@ -208,6 +216,29 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontSize: 15,
+        fontWeight: 'bold'
+    },
+    cabeca: {
+        position: 'absolute',
+        top: 75,
+        left: 0,
+        right: 0,
+        height: 70,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+    },
+    buttonLogout: {
+        padding: 5,
+        borderRadius: 15,
+        marginVertical: 15,
+        backgroundColor: '#437a36',
+        borderWidth: 2,
+        width: 75,
+        height: 35,
+    },
+    nomeText: {
+        fontSize: 20,
         fontWeight: 'bold'
     }
 })

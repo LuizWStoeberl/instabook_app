@@ -50,7 +50,7 @@ export default function RegisterScreen() {
                 displayName: name
             });
 
-            // Salvar email no Firestore com o UID como ID do documento
+            
             await setDoc(doc(db, 'users', user.uid), {
                 email: user.email,
                 name: name

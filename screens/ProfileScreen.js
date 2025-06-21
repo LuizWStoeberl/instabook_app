@@ -57,7 +57,10 @@ export default function UserProfile({ route }) {
     return (
         <SafeAreaView style={styles.container}>
 
-            <Text style={styles.header}>Perfil de {userName}</Text>
+            <View style={styles.cabeca}>
+                <Text style={styles.nomeUsuario}>{userName}</Text>
+            </View>
+
 
             <FlatList
                 data={posts}
@@ -68,8 +71,7 @@ export default function UserProfile({ route }) {
                 contentContainerStyle={{ paddingBottom: 20 }}
             />
 
-            
-
+        
             <View style={styles.rodape}>
                 <TouchableOpacity onPress={() => {
                     navigation.navigate('Home')
@@ -99,13 +101,11 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#dfffdc',
         paddingBottom: 80,
-        paddingTop: 80
+        paddingTop: 200
     },
-    header: {
-        marginTop: 50,
+    nomeUsuario: {
         fontSize: 22,
         fontWeight: 'bold',
-        marginBottom: 15,
     },
     gridImage: {
         width: Dimensions.get('window').width / 3 - 12,
@@ -128,5 +128,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderTopWidth: 1,
         borderColor: '#ccc'
+    },
+    cabeca: {
+        position: 'absolute',
+        top: 75,
+        left: 0,
+        right: 0,
+        height: 70,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
     }
 });
